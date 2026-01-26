@@ -18,29 +18,37 @@ VALUES
 ('Pooja', 'Laptop', 1, 58000, '2024-01-20'),
 ('Ankit', 'Tablet', 3, 28000, '2024-01-22');
 
+select * from customer_orders;
+-- Step 2: 
 SELECT *
 FROM customer_orders
 WHERE price > 30000;
 
+-- Step 3: 
 SELECT customer_name, product, price
 FROM customer_orders
+WHERE price > 20000
 ORDER BY price ASC;
 
 SELECT customer_name, product, price
 FROM customer_orders
+WHERE price > 20000
 ORDER BY price DESC;
 
-SELECT product, price, quantity
-FROM customer_orders
-ORDER BY product ASC, price DESC;
-
+-- step 4: 
 SELECT product,
        SUM(quantity * price) AS total_sales
 FROM customer_orders
 GROUP BY product;
-
+-- Step 5:
 SELECT product,
        SUM(quantity * price) AS total_sales
 FROM customer_orders
 GROUP BY product
 HAVING SUM(quantity * price) > 100000;
+-- Step 6: 
+select product, sum(quantity*price) as total_revenue
+from customer_orders
+where order_date >= '2024-01-15'
+group by product
+having sum(quantity*price) > 50000;
