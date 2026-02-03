@@ -15,8 +15,8 @@ Title:
  To implement and analyze SQL SELECT queries using filtering, sorting, grouping, and aggregation 
 concepts in PostgreSQL for efficient data retrieval and analytical reporting. 
 ### Code: 
-      --Step 1: 
-      CREATE TABLE customer_orders (
+    --Step 1: 
+    CREATE TABLE customer_orders (
     order_id SERIAL PRIMARY KEY,
     customer_name VARCHAR(50),
     product VARCHAR(50),
