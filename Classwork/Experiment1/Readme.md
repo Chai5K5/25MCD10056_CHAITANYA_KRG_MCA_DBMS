@@ -16,7 +16,7 @@ To design and implement a sample database system using DDL, DML, and DCL command
 including database creation, data manipulation, schema modification, and role-based access control to 
 ensure data integrity and secure, read-only access for authorized users. 
 ### Code: 
-        CREATE TABLE PROJECT(
+    CREATE TABLE PROJECT(
 	proj_id INT PRIMARY KEY CHECK(proj_id > 0),
 	proj_name VARCHAR(30) NOT NULL UNIQUE CHECK(length(proj_name) > 0),
 	dept_id INT REFERENCES DEPARTMENT(dept_id)
