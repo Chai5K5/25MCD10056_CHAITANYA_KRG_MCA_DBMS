@@ -12,6 +12,7 @@ INSERT INTO violation_review (entity_name, violation_count) VALUES
 
 SELECT * FROM violation_review;
 
+-- step 1: 
 -- case statement to classify violaions:
 SELECT *, 
 CASE WHEN violation_count = 0 THEN 'No Violations'
@@ -20,6 +21,7 @@ ELSE 'Critical Violations'
 END AS violations_level
 FROM violation_review;
 
+-- step 2: 
 -- Adding a status column: 
 ALTER TABLE violation_review
 ADD COLUMN status VARCHAR(20);
@@ -33,6 +35,7 @@ SET status =
 	END
 WHERE status IS NULL;
 
+-- step 3: 
 -- If Else: 
 DO $$
 DECLARE
@@ -54,4 +57,41 @@ BEGIN
     END IF;
 END $$;
 
+-- step 4
+CREATE TABLE student (
+    student_name VARCHAR(50),
+    marks INT
+);
 
+INSERT INTO student VALUES
+('Chai', 92),
+('Coffee', 78),
+('Tea', 65),
+('Latte', 48),
+('Chai-Latte', 33);
+
+SELECT
+student_name,
+marks,
+    CASE
+        WHEN marks >= 90 THEN 'A'
+        WHEN marks >= 75 THEN 'B'
+        WHEN marks >= 60 THEN 'C'
+        WHEN marks >= 40 THEN 'D'
+        ELSE 'Fail'
+    END AS grade
+FROM student;
+
+-- custom order filtering:
+SELECT
+    entity_name,
+    violation_count
+FROM violation_review
+ORDER BY
+    CASE
+        WHEN violation_count = 0 THEN 1
+        WHEN violation_count BETWEEN 1 AND 3 THEN 2
+        WHEN violation_count BETWEEN 4 AND 7 THEN 3
+        ELSE 4
+    END,
+    violation_count DESC;
