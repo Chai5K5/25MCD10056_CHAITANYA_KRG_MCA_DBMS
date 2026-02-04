@@ -76,3 +76,43 @@ CASE expressions for classification, validation, and rule-based data processing.
     END IF;
     END $$;
 <img width="401" height="52" alt="image" src="https://github.com/user-attachments/assets/0ff3915e-af2a-4aca-9745-b0cbba5d9117" />
+
+    CREATE TABLE student (
+        student_name VARCHAR(50),
+        marks INT
+    );
+    
+    INSERT INTO student VALUES
+    ('Amit', 92),
+    ('Riya', 78),
+    ('Neha', 65),
+    ('Rahul', 48),
+    ('Karan', 33);
+    
+    SELECT student_name,marks,
+        CASE
+            WHEN marks >= 90 THEN 'A'
+            WHEN marks >= 75 THEN 'B'
+            WHEN marks >= 60 THEN 'C'
+            WHEN marks >= 40 THEN 'D'
+            ELSE 'Fail'
+        END AS grade
+    FROM student;
+<img width="431" height="224" alt="image" src="https://github.com/user-attachments/assets/d16505ae-ce68-4904-977c-cf9e50f92231" />
+
+    -- custom order filtering:
+    SELECT
+        entity_name,
+        violation_count
+    FROM violation_review
+    ORDER BY
+        CASE
+            WHEN violation_count = 0 THEN 1
+            WHEN violation_count BETWEEN 1 AND 3 THEN 2
+            WHEN violation_count BETWEEN 4 AND 7 THEN 3
+            ELSE 4
+        END,
+        violation_count DESC;
+<img width="414" height="237" alt="image" src="https://github.com/user-attachments/assets/e3d3b0d1-db4e-4ea5-a64e-c45c82551bab" />
+
+
