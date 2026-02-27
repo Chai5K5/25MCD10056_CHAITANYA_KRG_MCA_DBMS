@@ -15,7 +15,7 @@
 
 ## 🎯 Aim of the Practical
 
-- To gain hands-on experience in creating and using cursors for row-by-row processing in a database, enabling sequential access and manipulation of query results for complex business logic. 
+- Learn how to create, query, and manage views in SQL to simplify database queries and provide a layer of abstraction for end-users. 
 
 
 ## 💻 Tools Used
@@ -25,144 +25,118 @@
 
 ## 📌 Objectives of the Practical
 
--	Sequential Data Access: To understand how to fetch rows one by one from a result set using cursor mechanisms.
--	Row-Level Manipulation: To perform specific operations or calculations on individual records that require conditional procedural logic.
--	Resource Management: To learn the lifecycle of a cursor: Declaring, Opening, Fetching, and importantly, Closing and Deallocating to manage system memory.
--	Exception Handling: To handle cursor-related errors and performance considerations during large-scale data iteration. 
+-	Data Abstraction: To understand how to hide complex table joins and calculations behind a simple virtual table interface. 
+- Enhanced Security: To learn how to restrict user access to sensitive columns by providing views instead of direct table access. 
+- Query Simplification: To master the creation of views that pre-join multiple tables, making reporting easier for non-technical users. 
+- View Management: To understand the syntax for creating, altering, and dropping views, as well as the naming conventions required for efficient data access. 
+
 
 
 ## 🛠️ Theory
+- A View is essentially a virtual table based on the result-set of an SQL statement. It does not contain data of its own but dynamically pulls data from the underlying "base tables". 
+  - Simple Views: Created from a single table without any aggregate functions or grouping. These are often updatable.
+  - Complex Views: Created from multiple tables using JOINs, or including GROUP BY and aggregate functions. These provide a consolidated summary of the database.
+  - Security Layer: In enterprise environments, views are used to grant permissions on specific subsets of data. For example, a "SalaryView" might exclude the "Employee_SSN" or "Home_Address" columns for privacy.
+  - Benefits: They simplify the user experience, ensure data consistency across reports, and reduce the risk of accidental data modification by providing read-only abstractions. 
 
-- While SQL is generally set-oriented, certain tasks require a procedural approach where 	we process one row at a time. This is where Cursors are used:
-  - Cursor Types: Cursors can be Implicit (managed by the system) or Explicit (defined by the developer). They can also be Forward-Only (moving only toward the end) or Scrollable (moving back and forth).
-  - The Lifecycle: * DECLARE: Defines the SQL query for the cursor. 
-      - OPEN: Executes the query and establishes the result set.
-      - FETCH: Retrieves a specific row into variables for processing.
-      - CLOSE: Releases the current result set.
-      - DEALLOCATE: Removes the cursor definition from memory. 
-  - Use Case: Cursors are ideal for generating row-specific reports, updating balances based on complex historical data, or migrating data where each record needs individual validation. 
 
 # 🛠️ Practical / Experiment Steps
 
-### Step 1: Implementing a Simple Forward-Only Cursor  
-- Creating a cursor to loop through an Employee table and print individual records. 
-  - Query:
-~~~ sql
--- Query 1
--- Create Staff table
-CREATE TABLE IF NOT EXISTS Staff (
-    StaffID INT PRIMARY KEY,
-    StaffName VARCHAR(50),
-    MonthlyPay INT
-);
--- Insert sample data
-INSERT INTO Staff VALUES (101, 'Dr. Meera', 70000)
-ON CONFLICT (StaffID) DO NOTHING;
-INSERT INTO Staff VALUES (102, 'Nurse Karan', 45000)
-ON CONFLICT (StaffID) DO NOTHING;
-INSERT INTO Staff VALUES (103, 'Technician Isha', 38000)
-ON CONFLICT (StaffID) DO NOTHING;
--- Cursor block
-DO $$
-DECLARE
-    staff_record RECORD;
-    staff_cursor CURSOR FOR
-        SELECT StaffID, StaffName, MonthlyPay FROM Staff;
-BEGIN
-    OPEN staff_cursor;
-    LOOP
-        FETCH staff_cursor INTO staff_record;
-        EXIT WHEN NOT FOUND;
-        RAISE NOTICE 'ID: %, Name: %, Monthly Pay: %',
-        staff_record.StaffID,
-        staff_record.StaffName,
-        staff_record.MonthlyPay;
-    END LOOP;
-    CLOSE staff_cursor;
-END $$;
- ~~~
-Output: 
- 
-<img width="394" height="246" alt="Screenshot 2026-02-04 183757" src="https://github.com/user-attachments/assets/6e567898-d555-4ed2-ba94-ae6e66c74937" />
-
-### Step 2: Complex Row-by-Row Manipulation  
-- Using a cursor to update salaries based on a dynamic "Experience-to-Performance" ratio logic. 
-  - Query:
+### Step 1: Creating a Simple View for Data Filtering 
+- Query:
 ~~~ sql 
--- Query 2
--- Add YearsOfService column
-ALTER TABLE Staff
-ADD COLUMN IF NOT EXISTS YearsOfService INT;
--- Update sample service values
-UPDATE Staff SET YearsOfService = 3 WHERE StaffID = 101;
-UPDATE Staff SET YearsOfService = 6 WHERE StaffID = 102;
-UPDATE Staff SET YearsOfService = 9 WHERE StaffID = 103;
--- Cursor to update salary based on years of service
-DO $$
-DECLARE
-    staff_record RECORD;
-    staff_cursor CURSOR FOR
-        SELECT StaffID, MonthlyPay, YearsOfService FROM Staff;
-BEGIN
-    OPEN staff_cursor;
-    LOOP
-        FETCH staff_cursor INTO staff_record;
-        EXIT WHEN NOT FOUND;
-        -- Salary update logic
-        IF staff_record.YearsOfService >= 8 THEN
-            UPDATE Staff
-            SET MonthlyPay = MonthlyPay + 8000
-            WHERE StaffID = staff_record.StaffID;
-        ELSIF staff_record.YearsOfService >= 5 THEN
-            UPDATE Staff
-            SET MonthlyPay = MonthlyPay + 5000
-            WHERE StaffID = staff_record.StaffID;
-        ELSE
-            UPDATE Staff
-            SET MonthlyPay = MonthlyPay + 2000
-            WHERE StaffID = staff_record.StaffID;
-        END IF;
-    END LOOP;
-    CLOSE staff_cursor;
-END $$;
--- View updated table
-SELECT * FROM Staff;
+-- Query 1
+
+-- Create Student table
+CREATE TABLE IF NOT EXISTS Student (
+    StudentID INT PRIMARY KEY,
+    StudentName VARCHAR(50),
+    Marks INT,
+    EnrollmentStatus VARCHAR(20)
+);
+
+-- Insert sample data
+INSERT INTO Student VALUES (201, 'Arjun', 78, 'Enrolled')
+ON CONFLICT (StudentID) DO NOTHING;
+
+INSERT INTO Student VALUES (202, 'Sneha', 85, 'Dropped')
+ON CONFLICT (StudentID) DO NOTHING;
+
+INSERT INTO Student VALUES (203, 'Ritika', 91, 'Enrolled')
+ON CONFLICT (StudentID) DO NOTHING;
+
+-- Create View to show only Enrolled Students
+CREATE OR REPLACE VIEW EnrolledStudents AS
+SELECT StudentID, StudentName, Marks
+FROM Student
+WHERE EnrollmentStatus = 'Enrolled';
+
+-- Query the View
+SELECT * FROM EnrolledStudents;SELECT *
 ~~~
-Output:  
-<img width="1028" height="245" alt="image" src="https://github.com/user-attachments/assets/edc6daa6-1600-4ccf-939a-58d8377c526e" />
- 
-### Step 3: Exception and Status Handling 
-- Ensuring the cursor handles empty result sets or termination signals gracefully. 
-  - Query:
+- Output:
+ <img width="717" height="188" alt="image" src="https://github.com/user-attachments/assets/00c66980-2d82-46c5-87ca-8dbff1d59637" />
+  
+### Step 2: Creating a View for Joining Multiple Tables  
+- Query:
 ~~~ sql
--- Query 3
-DO $$
-DECLARE
-    staff_record RECORD;
-    staff_cursor CURSOR FOR
-        SELECT StaffID, StaffName, MonthlyPay FROM Staff;
-BEGIN
-    OPEN staff_cursor;
-    -- Check if cursor has data
-    FETCH staff_cursor INTO staff_record;
-    IF NOT FOUND THEN
-        RAISE NOTICE 'No records found in Staff table.';
-    ELSE
-        LOOP
-            RAISE NOTICE 'Processing Staff ID: %, Name: %, Monthly Pay: %',
-            staff_record.StaffID,
-            staff_record.StaffName,
-            staff_record.MonthlyPay;
-            FETCH staff_cursor INTO staff_record;
-            EXIT WHEN NOT FOUND;
-        END LOOP;
-    END IF;
-    CLOSE staff_cursor;
-EXCEPTION
-    WHEN OTHERS THEN
-        RAISE NOTICE 'An error occurred: %', SQLERRM;
-END $$;
+-- Query 2
+-- Create Course table
+CREATE TABLE IF NOT EXISTS Course (
+    CourseID INT PRIMARY KEY,
+    CourseName VARCHAR(50)
+);
+-- Insert sample courses
+INSERT INTO Course VALUES (501, 'Computer Science')
+ON CONFLICT (CourseID) DO NOTHING;
+INSERT INTO Course VALUES (502, 'Mathematics')
+ON CONFLICT (CourseID) DO NOTHING;
+INSERT INTO Course VALUES (503, 'Physics')
+ON CONFLICT (CourseID) DO NOTHING;
+-- Add CourseID column to Student table
+ALTER TABLE Student
+ADD COLUMN IF NOT EXISTS CourseID INT;
+-- Assign courses to students
+UPDATE Student SET CourseID = 501 WHERE StudentID = 201;
+UPDATE Student SET CourseID = 502 WHERE StudentID = 202;
+UPDATE Student SET CourseID = 503 WHERE StudentID = 203;
+-- Create View joining Student and Course
+CREATE OR REPLACE VIEW StudentCourseView AS
+SELECT 
+    s.StudentID,
+    s.StudentName,
+    s.Marks,
+    c.CourseName
+FROM Student s
+JOIN Course c
+ON s.CourseID = c.CourseID;
+-- Query the View
+SELECT * FROM StudentCourseView;
 ~~~
-Output: 
-  <img width="1052" height="150" alt="image" src="https://github.com/user-attachments/assets/d2590e50-b08b-4374-997c-e3ec226bb159" />
+- Output: 
+  <img width="1024" height="255" alt="image" src="https://github.com/user-attachments/assets/84246889-054c-4f70-ae4d-8dd79f177664" />
+
+### Step 3: Advanced Summarization View 
+- Query:
+~~~ sql  
+-- Query 3
+-- Create summarization view showing course statistics
+CREATE OR REPLACE VIEW CourseSummaryView AS
+SELECT 
+    c.CourseName,
+    COUNT(s.StudentID) AS TotalStudents,
+    AVG(s.Marks) AS AverageMarks,
+    SUM(s.Marks) AS TotalMarks
+FROM Student s
+JOIN Course c
+ON s.CourseID = c.CourseID
+GROUP BY c.CourseName;
+
+-- Query the View
+SELECT * FROM CourseSummaryView;
+~~~
+- Output: 
+  <img width="1054" height="240" alt="image" src="https://github.com/user-attachments/assets/d72c8d96-5f12-4c79-9c57-9d91946346b0" />
+
+
 
