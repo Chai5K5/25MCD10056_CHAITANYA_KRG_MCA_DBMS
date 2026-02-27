@@ -10,7 +10,7 @@
 - Date of Performance: 27 Feb. 2026
 
 
-# 1️⃣ Experiment 5 
+# 1️⃣ Experiment 6
 
 
 ## 🎯 Aim of the Practical
