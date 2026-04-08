@@ -7,7 +7,7 @@
 - Semester: 2nd
 - Subject: Technical Training
 - Subject Code: 25CAP-652
-- Date of Performance: 02-Apr-2026
+- Date of Performance: 31-Mar-2026
 
   # 1️⃣ Experiment 7
 
