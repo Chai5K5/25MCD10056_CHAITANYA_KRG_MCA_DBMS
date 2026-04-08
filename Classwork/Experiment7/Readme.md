@@ -71,7 +71,7 @@ INSERT INTO Projects VALUES
 ```
 <img width="335" height="158" alt="image" src="https://github.com/user-attachments/assets/e3f019f1-e9de-46b5-b649-b2db6cb9eb9b" />
 
-``` aql
+``` sql
 -- Assignments
 INSERT INTO Assignments VALUES 
 (1, 201),
@@ -81,7 +81,7 @@ INSERT INTO Assignments VALUES
 ```
 <img width="253" height="158" alt="image" src="https://github.com/user-attachments/assets/b524a29f-723f-4697-b066-835971f975aa" />
 
-``` sqk
+``` sql
 -- Departments
 INSERT INTO Departments VALUES 
 (101, 'Engineering'),
